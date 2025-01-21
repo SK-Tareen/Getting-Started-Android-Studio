@@ -33,9 +33,9 @@ import com.example.saniahw1.ui.theme.SampleData
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import com.example.saniahw1.ui.theme.SaniaHW1Theme
 
@@ -61,12 +61,30 @@ fun Conversation(messages: List<Message>) {
         modifier = Modifier
             .fillMaxSize() // Ensures LazyColumn uses the available screen space
             .padding(8.dp) // Add padding around the content
-    )  {
+    ) {
+        // Add the header with a blue background
+        item {
+            Surface(
+                color = MaterialTheme.colorScheme.primary, // Set the blue background (primary color)
+                modifier = Modifier.fillMaxWidth() // Make the surface span the full width
+            ) {
+                Text(
+                    text = "A Conversation With Myself",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = MaterialTheme.colorScheme.onPrimary // Ensure text is readable on the blue background
+                    ),
+                    modifier = Modifier.padding(10.dp) // Add padding around the text
+                )
+            }
+        }
+        // Display the messages
         items(messages) { message ->
             MessageCard(message)
         }
     }
 }
+
+
 
 @Preview(
     name = "Light Mode")
@@ -89,12 +107,13 @@ fun MessageCard(msg: Message) {
         .padding(all = 8.dp)) {
         Image(
             painter = painterResource(R.drawable.me),
-            contentDescription = "Lip Gloss Picture",
+            contentDescription = "Any picture",
             modifier = Modifier
-                .size(40.dp) // Set desired width
+                .size(40.dp)
                 .clip(CircleShape)
                 .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
         )
+
         Spacer(modifier = Modifier.width(8.dp))
 
         var isExpanded by remember { mutableStateOf(false) }
@@ -107,17 +126,17 @@ fun MessageCard(msg: Message) {
             Text(
                 text = msg.author,
                 color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleMedium.copy(
+                style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold
                 )
             )
             Spacer(modifier = Modifier.height(4.dp))
 
             Surface(
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.extraLarge,
                 shadowElevation = 1.dp,
                 color = surfaceColor,
-                modifier = Modifier.animateContentSize().padding(1.dp)){
+                modifier = Modifier.animateContentSize().padding(2.dp)){
                 Text(
                     text = msg.body,
                     modifier = Modifier.padding(all = 4.dp),
