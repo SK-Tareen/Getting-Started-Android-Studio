@@ -7,4 +7,4 @@ This repository serves as an introduction to Android Studio and will be used for
 For file **MainActivity.kt**: 
 
 This section will include the first task and a basic introduction to Jetpack Compose. I will be following the [Jetpack Compose Tutorial](https://developer.android.com/develop/ui/compose/tutorial) with some modifications.
-The file gives a basic messaging UI with clickable features. Import your image with the name 'me' to use the code in the file. 
+The file gives a basic messaging UI with clickable features. You can scroll through the UI and see all the messages. You can also interact with the messages and click on them to expand. Import your image with the name 'me' to use the code in the file. 
