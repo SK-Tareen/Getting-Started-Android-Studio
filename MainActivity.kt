@@ -177,12 +177,11 @@ fun MainScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B)),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text(text = "Click here to order your makeup bundle")
+                Text(text = "Click here to order your makeup bundle!")
             }
         }
     }
 }
-
 
 @Composable
 fun OrderScreen(navController: NavController) {
@@ -192,39 +191,35 @@ fun OrderScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
-        contentAlignment = Alignment.TopCenter
+            .background(Color.White)
     ) {
+        Button(
+            onClick = { navController.popBackStack() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B)),
+            modifier = Modifier
+                .align(Alignment.TopStart) // Aligns the button to the top-start
+                .padding(start = 10.dp, top = 10.dp)
+        ) {
+            Text(text = "< Back")
+        }
+
+        // Rest of the content below the button
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.TopCenter) // Aligns the rest of the content below the button
+                .padding(top = 48.dp) // Adds spacing below the button
         ) {
-            Button(
-                onClick = { navController.popBackStack() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B)),
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp)
-
-            ) {
-                Text(text = "Back")
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+            Text(
+                text = "Create your profile to place an order!",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.Black
             )
-            {
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "Create your profile to place an order!",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color.Black,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-                Spacer(modifier = Modifier.weight(1f))
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Name", style = MaterialTheme.typography.bodyLarge)
+
+            Text(text = "Enter your full name", style = MaterialTheme.typography.bodyLarge)
             BasicTextField(
                 value = name,
                 onValueChange = { name = it },
@@ -239,7 +234,8 @@ fun OrderScreen(navController: NavController) {
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Name", style = MaterialTheme.typography.bodyLarge)
+
+            Text(text = "Enter your city", style = MaterialTheme.typography.bodyLarge)
             BasicTextField(
                 value = city,
                 onValueChange = { city = it },
@@ -255,40 +251,6 @@ fun OrderScreen(navController: NavController) {
         }
     }
 }
-
-
-@Composable
-fun Conversation(messages: List<ProductInfoClass>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        item {
-            Surface(
-                color = Color(0xBABD6471),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "What does your makeup say about you?",
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            color = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        modifier = Modifier.padding(10.dp)
-                    )
-                }
-            }
-        }
-        items(messages) { message ->
-            ProductInfoPage(message)
-        }
-    }
-}
-
 
 @Composable
 fun ProductInfoPage(info: ProductInfoClass) {
