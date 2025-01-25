@@ -1,4 +1,4 @@
-Android Jetpack Compose Application
+# Android Jetpack Compose Application
 
 This repository contains the source code for an Android application built using Jetpack Compose. The app showcases a makeup product catalog with detailed descriptions and ordering functionality.
 
