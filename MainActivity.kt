@@ -2,82 +2,112 @@ package com.example.newhw
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Build
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.ButtonDefaults
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
+
 import androidx.activity.compose.rememberLauncherForActivityResult
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.material3.Button
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.border
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Surface
-import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+
+import androidx.compose.material.icons.Icons
+
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
+
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+
 import android.Manifest
 import android.content.Context
+import android.content.Intent
+
 import java.io.FileOutputStream
 import java.io.IOException
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.ui.zIndex
 import android.content.SharedPreferences
-import androidx.camera.core.*
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+
 import coil.compose.AsyncImage
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
+import android.provider.Settings
+
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import java.io.File
 import java.util.concurrent.Executors
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
-import com.example.newhw.ui.theme.NewhwTheme
+import kotlinx.coroutines.delay
+
+//Permission imports
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.PermissionState
+
+//Notification imports
+import android.app.Notification
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+
+//Sensor imports
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import com.example.newhw.ui.theme.NewhwTheme
 
 @Composable
 fun ProductInfoPage(info: ProductInfoClass) {
@@ -145,10 +175,6 @@ fun MainScreen(navController: NavController) {
     var savedName by remember { mutableStateOf<String?>(null) }
     var savedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Retrieve the name and imageUri from navigation arguments
-    val backStackEntry = remember { navController.currentBackStackEntry }
-    val nameFromArgs = backStackEntry?.arguments?.getString("name")
-    val imageUriFromArgs = backStackEntry?.arguments?.getString("imageUri")
 
     LaunchedEffect(Unit) {
         val sharedPreferences = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE)
@@ -162,6 +188,7 @@ fun MainScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color(0xFFD2A5AB))
     ) {
+
         // Top Header (Name and Image)
         if (savedName != null && savedImageUri != null) {
             Column(
@@ -347,6 +374,12 @@ fun OrderScreen(navController: NavController) {
     var city by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var showErrorMessage by remember { mutableStateOf(false) }
+    var isNotificationEnabled by remember { mutableStateOf(false) }
+
+
+    // State for showing the message
+    var showRotationMessage by remember { mutableStateOf(false) }
+
 
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -358,9 +391,35 @@ fun OrderScreen(navController: NavController) {
             }
         }
 
+    //Saved variables
     var savedName by remember { mutableStateOf<String?>(null) }
     var savedCity by remember { mutableStateOf<String?>(null) }
     var savedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    //Sensor variables
+    val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    val gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+    var rotationAngle by remember { mutableStateOf(0f) }
+    var notificationTriggered by remember { mutableStateOf(false) }
+
+    //Notification Permission & channel
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        isNotificationEnabled = notificationManager.areNotificationsEnabled()
+    } else {
+        isNotificationEnabled = true // Notifications are always enabled for older versions
+    }
+
+    // Request notification permission if not granted
+    fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            }
+            context.startActivity(intent)
+        }
+    }
 
     // Load saved data from SharedPreferences
     LaunchedEffect(Unit) {
@@ -371,11 +430,109 @@ fun OrderScreen(navController: NavController) {
             savedName?.let { Uri.parse(sharedPreferences.getString("imageUri", "")) }
     }
 
+    // Create Notification Channel (for Android 8 and above)
+    fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "notification_channel_id",
+                "Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Main screen notifications"
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    fun showNotification(context: Context) {
+        val notification = NotificationCompat.Builder(context, "notification_channel_id")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Woah youre rotating? Maybe Feel like shopping?")
+            .setContentText("Click to go to the main screen")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(context, MainActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    },
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            .setAutoCancel(true)
+            .build()
+
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        notificationManager.notify(1, notification)
+    }
+
+    // Gyroscope Sensor Listener
+    val sensorEventListener = rememberUpdatedState(object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            event?.let {
+                if (it.sensor.type == Sensor.TYPE_GYROSCOPE) {
+                    // Calculate rotation angle (in degrees)
+                    val rotation = it.values[2] * 180 / Math.PI.toFloat() // Z-axis rotation (in degrees)
+                    if (rotation >= 110) {
+                        showRotationMessage = true // Trigger the message
+                        showNotification(context) // Show the notification
+                        notificationTriggered = true // Prevent multiple triggers
+                    }
+                }
+            }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    })
+
+
+    LaunchedEffect(showRotationMessage) {
+        // Reset notification flag after a delay
+        if (showRotationMessage) {
+            delay(30000) // 30 seconds
+            notificationTriggered = false // Reset the flag
+        }
+    }
+
+
+    // Start listening to the gyroscope sensor
+    LaunchedEffect(Unit) {
+        sensorManager.registerListener(
+            sensorEventListener.value,
+            gyroscope,
+            SensorManager.SENSOR_DELAY_UI
+        )
+    }
+
+    // Unregister sensor listener when the composable is disposed
+    DisposableEffect(context) {
+        onDispose {
+            sensorManager.unregisterListener(sensorEventListener.value)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
+        if (showRotationMessage) {
+            Text(
+                text = "Woah that was a big Rotation slow down",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Red,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp)
+            )
+        }
         Button(
             onClick = { navController.popBackStack() },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B)),
@@ -548,6 +705,22 @@ fun OrderScreen(navController: NavController) {
                     contentDescription = "User's Image",
                     modifier = Modifier.size(50.dp).clip(CircleShape)
                 )
+            }
+            // Enable notifications button
+            if (!isNotificationEnabled) {
+                Button(
+                    onClick = {
+                        requestNotificationPermission()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B)),
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text(text = "Enable Notifications")
+                }
+            } else {
+                // Once permission is granted, show the notification and remove the button
+                createNotificationChannel()
+                showNotification(context)
             }
         }
     }
