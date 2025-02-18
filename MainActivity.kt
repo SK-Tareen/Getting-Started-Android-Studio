@@ -48,6 +48,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import android.Manifest
 import android.content.Context
+import java.io.FileOutputStream
+import java.io.IOException
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -150,16 +152,24 @@ class MainActivity : ComponentActivity() {
 fun getUserData(context: Context): Pair<String?, String?> {
     val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
     val name = sharedPreferences.getString("user_name", null)
-    val imageUri = sharedPreferences.getString("user_image_uri", null)
-    return Pair(name, imageUri)
+    val imagePath = sharedPreferences.getString("user_image_uri", null)
+
+    // Ensure the file still exists before returning it
+    val imageFile = imagePath?.let { File(it) }
+    return if (imageFile != null && imageFile.exists()) {
+        Pair(name, Uri.fromFile(imageFile).toString())
+    } else {
+        Pair(name, null)
+    }
 }
 
 
-fun saveUserData(context: Context, name: String, imageUri: String) {
+
+fun saveUserData(context: Context, name: String, imageUri: Uri) {
     val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
     val editor = sharedPreferences.edit()
     editor.putString("user_name", name)
-    editor.putString("user_image_uri", imageUri)
+    editor.putString("user_image_uri", imageUri.path) // Save file path
     editor.apply()
 }
 
@@ -212,7 +222,7 @@ fun MainScreen(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 AsyncImage(
-                    model = savedImageUri,
+                    model = savedImageUri?.let { Uri.parse(it) }, // Convert string to Uri
                     contentDescription = "User's Image",
                     modifier = Modifier.size(50.dp).clip(CircleShape)
                 )
@@ -331,8 +341,9 @@ fun MainScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    val editor =
-                        context.getSharedPreferences("user_data", Context.MODE_PRIVATE).edit()
+                    val file = File(context.filesDir, "saved_image.jpg")
+                    file.delete() // Delete the stored image
+                    val editor = context.getSharedPreferences("user_data", Context.MODE_PRIVATE).edit()
                     editor.remove("user_name")
                     editor.remove("user_image_uri")
                     editor.apply()
@@ -346,6 +357,22 @@ fun MainScreen(navController: NavController) {
     }
 }
 
+fun saveImageToInternalStorage(context: Context, uri: Uri): Uri? {
+    try {
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return null
+        val file = File(context.filesDir, "saved_image.jpg")
+        val outputStream = FileOutputStream(file)
+
+        inputStream.copyTo(outputStream)
+        inputStream.close()
+        outputStream.close()
+
+        return Uri.fromFile(file) // Return the new internal storage URI
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return null
+}
 
 
 @Composable
@@ -354,15 +381,19 @@ fun OrderScreen(navController: NavController) {
     var city by remember { mutableStateOf("") }
     var showErrorMessage by remember { mutableStateOf(false) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current // Get context
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            imageUri = uri
+            uri?.let {
+                val savedUri = saveImageToInternalStorage(context, it)
+                savedUri?.let {
+                    imageUri = it
+                }
+            }
         }
     var savedName by remember { mutableStateOf<String?>(null) }
     var savedCity by remember { mutableStateOf<String?>(null) }
     var savedImageUri by remember { mutableStateOf<Uri?>(null) }
-
-    val context = LocalContext.current
 
     // Load saved data from SharedPreferences
     LaunchedEffect(Unit) {
