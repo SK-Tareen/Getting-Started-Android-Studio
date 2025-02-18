@@ -121,8 +121,6 @@ fun ProductInfoPage(info: ProductInfoClass) {
     }
 }
 
-
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,18 +128,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             NewhwTheme {
                 val navController = rememberNavController()
-
-                // Use the existing getUserData function, move it to a Composable scope
-                val (savedName, savedImageUri) = remember { getUserData(this@MainActivity) }
-
-                // Set up navigation with saved user data
-                NavHost(navController = navController, startDestination = "main") {
-                    composable("main?name={name}&imageUri={imageUri}") { backStackEntry ->
-                        val name = backStackEntry.arguments?.getString("name") ?: savedName
-                        val imageUri = backStackEntry.arguments?.getString("imageUri") ?: savedImageUri
-                        MainScreen(navController = navController)
-                    }
-
+                NavHost(navController, startDestination = "main") {
+                    composable("main") { MainScreen(navController) }
                     composable("order") { OrderScreen(navController) }
                 }
             }
@@ -149,40 +137,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun getUserData(context: Context): Pair<String?, String?> {
-    val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
-    val name = sharedPreferences.getString("user_name", null)
-    val imagePath = sharedPreferences.getString("user_image_uri", null)
-
-    // Ensure the file still exists before returning it
-    val imageFile = imagePath?.let { File(it) }
-    return if (imageFile != null && imageFile.exists()) {
-        Pair(name, Uri.fromFile(imageFile).toString())
-    } else {
-        Pair(name, null)
-    }
-}
-
-
-
-fun saveUserData(context: Context, name: String, imageUri: Uri) {
-    val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE)
-    val editor = sharedPreferences.edit()
-    editor.putString("user_name", name)
-    editor.putString("user_image_uri", imageUri.path) // Save file path
-    editor.apply()
-}
-
-
 data class ProductInfoClass(val productName: String, val productInfo: String, val imageResource: Int)
-
-
 
 @Composable
 fun MainScreen(navController: NavController) {
     val context = LocalContext.current
     var savedName by remember { mutableStateOf<String?>(null) }
-    var savedImageUri by remember { mutableStateOf<String?>(null) }
+    var savedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     // Retrieve the name and imageUri from navigation arguments
     val backStackEntry = remember { navController.currentBackStackEntry }
@@ -190,15 +151,11 @@ fun MainScreen(navController: NavController) {
     val imageUriFromArgs = backStackEntry?.arguments?.getString("imageUri")
 
     LaunchedEffect(Unit) {
-        if (nameFromArgs != null && imageUriFromArgs != null) {
-            savedName = nameFromArgs
-            savedImageUri = imageUriFromArgs
-        } else {
-            val (nameSP, imageUriSP) = getUserData(context)
-            savedName = nameSP
-            savedImageUri = imageUriSP
-        }
+        val sharedPreferences = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE)
+        savedName = sharedPreferences.getString("name", null)
+        savedImageUri = sharedPreferences.getString("imageUri", null)?.let { Uri.parse(it) }
     }
+
 
     Box(
         modifier = Modifier
@@ -212,20 +169,26 @@ fun MainScreen(navController: NavController) {
                     .padding(16.dp)
                     .align(Alignment.TopStart)
                     .background(Color(0xFFD2A5AB))
-                    .zIndex(1f) // Ensure it stays on top of the scrollable content
             ) {
                 savedName?.let {
                     Text(
                         text = "Hi $it !",
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                AsyncImage(
-                    model = savedImageUri?.let { Uri.parse(it) }, // Convert string to Uri
-                    contentDescription = "User's Image",
-                    modifier = Modifier.size(50.dp).clip(CircleShape)
-                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                savedImageUri?.let { uri ->
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = "User's Profile Image",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape)
+                    )
+                }
             }
         }
 
@@ -295,7 +258,7 @@ fun MainScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 100.dp)
+                .padding(top = 120.dp)
         ) {
             // LazyColumn for the product list
             LazyColumn(
@@ -341,12 +304,13 @@ fun MainScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    val file = File(context.filesDir, "saved_image.jpg")
-                    file.delete() // Delete the stored image
-                    val editor = context.getSharedPreferences("user_data", Context.MODE_PRIVATE).edit()
-                    editor.remove("user_name")
-                    editor.remove("user_image_uri")
-                    editor.apply()
+                    val sharedPreferences = context.getSharedPreferences("user_data", Context.MODE_PRIVATE).edit()
+                    sharedPreferences.clear() // Clear all stored user data
+                    sharedPreferences.apply()
+
+                    // Reset UI state
+                    savedName = null
+                    savedImageUri = null
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -377,11 +341,13 @@ fun saveImageToInternalStorage(context: Context, uri: Uri): Uri? {
 
 @Composable
 fun OrderScreen(navController: NavController) {
+    val context = LocalContext.current
+
     var name by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
-    var showErrorMessage by remember { mutableStateOf(false) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    val context = LocalContext.current // Get context
+    var showErrorMessage by remember { mutableStateOf(false) }
+
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
@@ -391,6 +357,7 @@ fun OrderScreen(navController: NavController) {
                 }
             }
         }
+
     var savedName by remember { mutableStateOf<String?>(null) }
     var savedCity by remember { mutableStateOf<String?>(null) }
     var savedImageUri by remember { mutableStateOf<Uri?>(null) }
