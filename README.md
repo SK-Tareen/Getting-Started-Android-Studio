@@ -1,6 +1,6 @@
 # Android Jetpack Compose Application
 
-This repository contains the source code for an Android application built using Jetpack Compose. The app showcases a makeup product catalog with detailed descriptions and ordering functionality.
+This repository contains the source code for an Android application built using Jetpack Compose. The app showcases a makeup product catalogue with detailed descriptions and ordering functionality.
 You can access the Main Activity here: newhw/app/src/main/java/com/example/newhw/MainActivity.kt
 
 ---
@@ -38,8 +38,4 @@ You can access the Main Activity here: newhw/app/src/main/java/com/example/newhw
 - Minimum SDK version 21.
 - Kotlin 1.9 or higher.
 
-### Steps to Build and Run
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/saniahw1.git
-   cd saniahw1
+
