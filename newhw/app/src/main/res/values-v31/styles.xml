@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Newhw.Splash" parent="Theme.Material3.DayNight">
+        <item name="android:windowBackground">@color/splash_background_color</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item> <!-- Custom Icon -->
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/white</item> <!-- Background color behind icon -->
+    </style>
+</resources>

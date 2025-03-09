@@ -43,21 +43,18 @@ android {
 
 dependencies {
 
-    // Camera permissions
-    implementation("androidx.camera:camera-core:1.4.1")
-    implementation("androidx.camera:camera-camera2:1.4.1")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
-    implementation("androidx.camera:camera-view:1.4.1")
-    implementation("androidx.camera:camera-extensions:1.4.1")
-    implementation("androidx.compose.ui:ui:1.4.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.4.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
-    implementation("androidx.core:core:1.8.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0") // or the latest version
-    implementation("androidx.activity:activity-compose:1.6.0")
+    implementation(libs.ui)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose) // or the latest version
+    implementation(libs.androidx.activity.compose)
 
-    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.material) // Latest Material 3 library
+
+    implementation(libs.accompanist.permissions)
+    implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

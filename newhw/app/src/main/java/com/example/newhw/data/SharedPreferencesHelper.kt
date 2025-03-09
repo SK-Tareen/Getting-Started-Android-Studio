@@ -1,7 +1,6 @@
 package com.example.newhw.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.net.Uri
 
 object SharedPreferencesHelper {

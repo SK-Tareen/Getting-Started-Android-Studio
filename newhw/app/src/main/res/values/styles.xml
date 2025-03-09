@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Splash Screen theme -->
+    <style name="Theme.Newhw.Splash" parent="Theme.Material3.DayNight">
+        <!-- Set the background color using the color defined in colors.xml -->
+        <item name="android:windowBackground">@color/splash_background_color</item> <!-- Use color from colors.xml -->
+    </style>
+
+</resources>
