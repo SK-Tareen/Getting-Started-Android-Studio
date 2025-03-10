@@ -22,6 +22,6 @@ fun SplashScreen(navController: NavController) {
                 // Prevent navigating back to the splash screen by popping it
                 popUpTo("splashscreen") { inclusive = true }
             }
-        }, 1000) // Delay for 2 seconds
+        }, 500)
     }
 }

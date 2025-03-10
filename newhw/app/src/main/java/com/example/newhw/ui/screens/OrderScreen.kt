@@ -33,9 +33,15 @@ import com.example.newhw.utils.NotificationHandler
 import com.example.newhw.utils.SensorHandler
 import com.example.newhw.utils.FileUtils
 import android.media.MediaPlayer
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.newhw.audio.AudioRecorder
 
 import com.example.newhw.data.SharedPreferencesHelper
+import androidx.core.content.edit
+
+
+@RequiresApi(Build.VERSION_CODES.S)
 
 
 @Composable
@@ -87,6 +93,20 @@ fun OrderScreen(navController: NavController) {
             imageUri = loadedImageUri
         }
     }
+
+    fun checkAndRequestPermission(context: Context, permission: String, onPermissionGranted: () -> Unit) {
+        when {
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED -> {
+                // Permission is already granted, proceed
+                onPermissionGranted()
+            }
+            else -> {
+                // Request permission
+                requestPermissionLauncher.launch(permission)
+            }
+        }
+    }
+
 
     // Gyroscope sensor listener setup
     var showRotationMessage by remember { mutableStateOf(false) }
@@ -182,7 +202,7 @@ fun OrderScreen(navController: NavController) {
                 onClick = {
                     // Reset user data in SharedPreferences
                     val sharedPreferences = context.getSharedPreferences("UserInfo", Context.MODE_PRIVATE)
-                    sharedPreferences.edit().clear().apply()
+                    sharedPreferences.edit() { clear() }
                     name = ""
                     city = ""
                     imageUri = null
@@ -201,12 +221,14 @@ fun OrderScreen(navController: NavController) {
             // Audio Recording Button
             Button(
                 onClick = {
-                    if (!isRecording) {
-                        audioFilePath = recorder.startRecording()
-                        isRecording = true
-                    } else {
-                        recorder.stopRecording()
-                        isRecording = false
+                    checkAndRequestPermission(context, Manifest.permission.RECORD_AUDIO) {
+                        if (!isRecording) {
+                            audioFilePath = recorder.startRecording()
+                            isRecording = true
+                        } else {
+                            recorder.stopRecording()
+                            isRecording = false
+                        }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = if (isRecording) Color.Red else Color.Green),
@@ -214,6 +236,7 @@ fun OrderScreen(navController: NavController) {
             ) {
                 Text(if (isRecording) "Stop Recording" else "Start Recording")
             }
+
 
 
             Spacer(modifier = Modifier.height(16.dp))
