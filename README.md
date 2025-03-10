@@ -26,3 +26,14 @@ Ensure you have the following installed:
 ```sh
 git clone https://github.com/SK-Tareen/Getting-Started-Android-Studio.git
 cd Getting-Started-Android-Studio
+
+### 3️⃣ Open in Android Studio
+
+1. Launch **Android Studio**.
+2. Click **Open** and select the project folder.
+3. Wait for Gradle to sync.
+
+### 4️⃣ Run the App
+
+- Connect a **physical Android device** or launch an **Android Emulator**.
+- Click the **Run ▶** button in Android Studio.
