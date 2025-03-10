@@ -26,6 +26,7 @@ Ensure you have the following installed:
 ```sh
 git clone https://github.com/SK-Tareen/Getting-Started-Android-Studio.git
 cd Getting-Started-Android-Studio
+```
 
 ### 3️⃣ Open in Android Studio
 
