@@ -1,41 +1,28 @@
-# Android Jetpack Compose Application
+# Getting Started with Android Studio
 
-This repository contains the source code for an Android application built using Jetpack Compose. The app showcases a makeup product catalogue with detailed descriptions and ordering functionality.
-You can access the Main Activity here: newhw/app/src/main/java/com/example/newhw/MainActivity.kt
+Welcome to **Getting Started with Android Studio**! This project serves as a beginner-friendly guide to setting up and building Android applications using **Jetpack Compose**, and more.
 
----
+## 📌 Features
 
-## 📱 Features
+- **Jetpack Compose UI** - Modern UI toolkit for building native Android UIs.
+- **Gallery Image Selection** - Pick and display images from the gallery.
+- **Audio Recording & Playback** - Record and play audio within the app.
+- **Gyroscope Sensor** - Detect device rotation and trigger actions.
+- **SharedPreferences** - Save and load user data locally.
 
-1. **Home Screen:**
-   - Displays a list of products with images and brief descriptions.
-   - Click on a product to expand and see more details.
+## 🚀 Getting Started
 
-2. **Order Screen:**
-   - Allows users to create a profile to place an order.
-   - Navigate back to the main screen with ease.
+### 1️⃣ Prerequisites
 
-3. **Navigation:**
-   - Built-in navigation between the Main Screen and Order Screen.
+Ensure you have the following installed:
 
-4. **Animations:**
-   - Smooth UI animations for expanding product descriptions.
+- **Android Studio** (latest version)
+- **Java 11+ or Kotlin**
+- **Android SDK** & **AVD Emulator** (or a physical device)
+- **Gradle** (bundled with Android Studio)
 
----
+### 2️⃣ Clone the Repository
 
-## 🛠️ Technologies Used
-
-- **Jetpack Compose**: Modern UI toolkit for building native Android UIs.
-- **Navigation Component**: For managing screen navigation.
-- **Material Design 3**: Implements Material Design components and themes.
-
----
-
-## 🔧 Setup Instructions
-
-### Prerequisites
-- Android Studio Dolphin or higher.
-- Minimum SDK version 21.
-- Kotlin 1.9 or higher.
-
-
+```sh
+git clone https://github.com/SK-Tareen/Getting-Started-Android-Studio.git
+cd Getting-Started-Android-Studio
