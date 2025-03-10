@@ -38,3 +38,32 @@ cd Getting-Started-Android-Studio
 
 - Connect a **physical Android device** or launch an **Android Emulator**.
 - Click the **Run ▶** button in Android Studio.
+  
+
+## 🛠 Technologies Used
+
+This project is built using:
+
+- **Kotlin** - Primary language for Android development  
+- **Jetpack Compose** - Modern UI toolkit for building native UIs  
+- **CameraX** - For integrating camera functionality  
+- **MediaPlayer & AudioRecorder** - For audio recording and playback  
+- **SharedPreferences** - For storing user data persistently  
+- **Coil** - For loading and displaying images  
+- **Sensors (Gyroscope)** - For detecting device rotation  
+- **Android Jetpack Libraries** - Including Navigation, ViewModel, and LiveData  
+
+## 📜 Permissions Required
+
+This app requires the following permissions for full functionality:
+
+```xml
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+```
+
+
+
